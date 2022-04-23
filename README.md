@@ -13,4 +13,5 @@ Visual Studio 2019 is recommended
 <ins>**2. Building and Running the Project:**</ins>
 
 - Run GenerateProjects.bat file this will generate a visual studio solution.
-- Open the solution and build it once after the build rebuild the solution again.
+- Open the solution and set Sandbox as startup project.
+- Build the solution once after that rebuild the solution.

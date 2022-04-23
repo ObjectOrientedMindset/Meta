@@ -6,12 +6,13 @@ Meta Engine
 
 Visual Studio 2019 is recommended
 
-<ins>**1. Downloading the repository:**</ins>
+<ins>**1. Downloading the Repository:**</ins>
 
 -Cloning the repository    `git clone --recursive https://github.com/ObjectOrientedMindset/Meta`.
 
-<ins>**2. Building and Running the Project:**</ins>
+<ins>**2. Building and Setting the Project:**</ins>
 
-- Run GenerateProjects.bat file this will generate a visual studio solution.(Default is vs2019 you can edit this file for your version of visual studio)
+- Open GenerateProjects.bat with any text editor or ide you can see default setting is vs2019 change this for your version of visual studio.
+- Run GenerateProjects.bat file this will generate a visual studio solution.
 - Open the solution and set Sandbox as startup project.
 - Build the solution once after that rebuild the solution.

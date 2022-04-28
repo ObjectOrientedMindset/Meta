@@ -34,6 +34,16 @@ namespace Meta {
 		return this->sprite.getPosition();
 	}
 
+	const int Tile::getTileCode()
+	{
+		return this->tileCode;
+	}
+
+	const int Tile::getTileLayer()
+	{
+		return this->tileLayer;
+	}
+
 	void Tile::update()
 	{
 

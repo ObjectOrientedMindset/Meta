@@ -12,7 +12,7 @@ namespace Meta {
 		std::vector<int> tile_code;
 		std::vector<int> tile_layer;
 		std::vector<sf::Vector2f> tilePosition;
-		std::map<int, std::vector<Tile*>> tile;
+		std::map<int, std::vector<Tile*>> tile; //int is for layers
 		sf::Vector2u maxSize;
 
 		Tilemap();

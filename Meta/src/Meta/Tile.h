@@ -19,6 +19,8 @@ namespace Meta {
 		virtual ~Tile();
 
 		const sf::Vector2f& getTilePosition();
+		const int getTileCode();
+		const int getTileLayer();
 		void update();
 		void render(sf::RenderTarget* window);
 	};

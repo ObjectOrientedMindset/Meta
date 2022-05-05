@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
 
-
 namespace Meta {
 
 	class META_API Tile
@@ -22,7 +21,7 @@ namespace Meta {
 		const int getTileCode();
 		const int getTileLayer();
 		void update();
-		void render(sf::RenderTarget* window);
+		void render(std::shared_ptr<sf::RenderWindow> window);
 	};
 
 }

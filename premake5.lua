@@ -11,6 +11,10 @@ workspace "Meta"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+
+
+include "Meta/vendor/Glad"
+
 project "Meta"
 	location "Meta"
 	kind "SharedLib"
@@ -31,12 +35,20 @@ project "Meta"
 	includedirs
 	{
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/vendor/SFML/include"
+		"%{prj.name}/vendor/SFML/include",
+		"Meta/vendor/Glad/include"
 	}
 
 	libdirs
 	{
-		"%{prj.name}/vendor/SFML/lib"
+		"%{prj.name}/vendor/SFML/lib",
+		"Glad"
+	}
+
+	links
+	{
+		"Glad",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"

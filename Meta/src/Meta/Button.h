@@ -28,7 +28,7 @@ namespace Meta {
 		//Functions
 		const bool isClicked();
 		void update(const sf::Vector2f mousePos);
-		void render(sf::RenderWindow* window);
+		void render(std::shared_ptr<sf::RenderWindow> window);
 
 	};
 

@@ -1,6 +1,7 @@
 #pragma once
-#include"Button.h"
+#include "Button.h"
 #include "Core.h"
+#include "Window.h"
 
 namespace Meta {
 
@@ -8,9 +9,9 @@ namespace Meta {
 	{
 	protected:
 		//Game window
-		sf::RenderWindow* window;
+		std::shared_ptr<Window> window;
 		//States
-		std::stack<State*>* states;
+		std::stack<std::shared_ptr<State>>* states;
 		//Fonts
 		sf::Font pixelFont;
 		//Mouse
@@ -20,15 +21,17 @@ namespace Meta {
 		//Files
 		std::string filePathway[5];
 	public:
-		State(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys);
+			State(std::shared_ptr<Window> window,
+			std::stack<std::shared_ptr<State>>* states,
+			std::map<std::string, int>* supported_keys);
 		virtual ~State();
 
 		sf::Vector2f& getMousePos();
 
 		//Functions
-		virtual void endState(std::stack<State*>* states) = 0;
+		virtual void endState() = 0;
 		virtual void update(const float& dt) = 0;
-		virtual void render(sf::RenderWindow* window) = 0;
+		virtual void render() = 0;
 
 
 	};

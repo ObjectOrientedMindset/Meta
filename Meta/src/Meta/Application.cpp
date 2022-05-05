@@ -1,12 +1,16 @@
 #include "pch.h"
 #include "Application.h"
+#include "MainMenu.h"
+
+
+
 
 namespace Meta {
-
+	
 	void Application::initWindow()
 	{
 		//Initialize Game window
-		this->window = new sf::RenderWindow(sf::VideoMode(1024, 960), "Sanbox", sf::Style::Close | sf::Style::Titlebar);
+		window = std::make_shared<Window>();
 	}
 	void Application::initSupportedKeys()
 	{
@@ -16,76 +20,66 @@ namespace Meta {
 
 		while (keys_file >> key >> key_digit)
 		{
-			this->supportedKeys[key] = key_digit;
+			supportedKeys[key] = key_digit;
 		}
 		keys_file.close();
 	}
 	Application::Application()
 	{
-		this->initWindow();
-		this->initSupportedKeys();
-		this->initStates();
+		initWindow();
+		initSupportedKeys();
+		initStates();
 	}
 	Application::~Application()
 	{
-		delete this->window;
 	}
 
 	void Application::initStates()
 	{
-		this->state.push(new MainMenu(this->window, &this->state, &this->supportedKeys));
+		states.push(std::make_shared<MainMenu>(window, &states, &supportedKeys));
 	}
 
 	void Application::updateDt()
 	{
 		//Updates the dt variable with the time it takes to update and render one frame
 
-		this->dt = this->dtClock.restart().asSeconds();
-	}
-
-	void Application::pollEvents()
-	{
-		while (this->window->pollEvent(this->e))
-		{
-			if (this->e.type == sf::Event::Closed)
-				this->window->close();
-
-		}
+		dt = dtClock.restart().asSeconds();
 	}
 
 	void Application::update()
 	{
-		if (this->state.empty() == false)
+		if (states.empty() == false)
 		{
-			this->state.top()->update(this->dt);
+			states.top()->update(dt);
 		}
 		//Application end
 		else
 		{
-			this->window->close();
+			window->getWindow()->close();
 		}
 	}
-
+	
 	void Application::render()
 	{
-		this->window->clear();
+		window->getWindow()->clear();
+		
 
-		if (this->state.empty() == false)
+		if (states.empty() == false)
 		{
-			this->state.top()->render(this->window);
+			states.top()->render();
 		}
 
-		this->window->display();
+		window->getWindow()->display();
 	}
 
 	void Application::run()
 	{
-		while (this->window->isOpen())
+		while (window->getWindow()->isOpen())
 		{
-			this->updateDt();
-			this->pollEvents();
-			this->update();
-			this->render();
+			updateDt();
+			window->pollEvents();
+			update();
+			render();
 		}
 		
 	}

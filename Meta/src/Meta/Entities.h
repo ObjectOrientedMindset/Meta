@@ -14,7 +14,7 @@ namespace Meta {
 		//Functions
 
 		virtual void update() = 0;
-		virtual void render(sf::RenderTarget* target) = 0;
+		virtual void render(std::shared_ptr<sf::RenderWindow> target) = 0;
 	};
 
 }

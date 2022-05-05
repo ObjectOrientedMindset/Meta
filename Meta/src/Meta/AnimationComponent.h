@@ -21,21 +21,21 @@ private:
 			currentRect(startRect), endRect(end_frameX* width, end_frameY* height, width, height),
 			startFrameX(start_frameX), startFrameY(start_frameY), width(width), height(height)
 		{
-			this->sprite.setTextureRect(startRect);
+			sprite.setTextureRect(startRect);
 		}
 
 		void play(const float& dt)
 		{
 
-			if (this->currentRect == this->endRect)
+			if (currentRect == endRect)
 			{
-				this->currentRect = this->startRect;
+				currentRect = startRect;
 			}
 			else
 			{
-				this->currentRect.left += this->width;
+				currentRect.left += width;
 			}
-			this->sprite.setTextureRect(this->currentRect);
+			sprite.setTextureRect(currentRect);
 
 		}
 	};
@@ -48,7 +48,7 @@ public:
 	}
 	virtual ~AnimationComponent()
 	{
-		for (auto& i : this->animations)
+		for (auto& i : animations)
 		{
 			delete i.second;
 		}
@@ -56,12 +56,12 @@ public:
 	void addAnimation(const std::string key, sf::Sprite& sprite, float animation_timer
 		, int start_frame_x, int start_frame_y, int end_frames_x, int end_frames_y, int width, int height)
 	{
-		this->animations[key] = new Animation(sprite, start_frame_x, start_frame_y, end_frames_x, end_frames_y, width, height);
+		animations[key] = new Animation(sprite, start_frame_x, start_frame_y, end_frames_x, end_frames_y, width, height);
 	}
 
 	void playAnimation(std::string key, const float& dt)
 	{
-		this->animations[key]->play(dt);
+		animations[key]->play(dt);
 	}
 };
 

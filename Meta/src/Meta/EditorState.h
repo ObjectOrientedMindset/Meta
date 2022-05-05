@@ -1,7 +1,7 @@
 #pragma once
 #include "State.h"
-#include"PauseMenu.h"
-#include"Tilemap.h"
+#include "PauseMenu.h"
+#include "Tilemap.h"
 #include "Core.h"
 
 namespace Meta {
@@ -12,7 +12,7 @@ namespace Meta {
     private:
         //Variables
         PauseMenu pmenu;
-        std::stack<Tilemap*> tilemaps;
+        std::stack<std::shared_ptr<Tilemap>> tilemaps;
         bool pause;
         float timer;
         float timerMax;
@@ -38,13 +38,13 @@ namespace Meta {
         void changetileCode();
         void changeMap();
     public:
-        EditorState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys);
+        EditorState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states, std::map<std::string, int>* supported_keys);
         virtual ~EditorState();
 
         //Functions
-        void endState(std::stack<State*>* states);
+        void endState();
         void update(const float& dt);
-        void render(sf::RenderWindow* window);
+        void render();
     };
 
 }

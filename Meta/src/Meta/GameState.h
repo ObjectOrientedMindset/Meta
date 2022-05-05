@@ -1,8 +1,8 @@
 #pragma once
 #include "State.h"
-#include"Player.h"
-#include"Tilemap.h"
-#include"PauseMenu.h"
+#include "Player.h"
+#include "Tilemap.h"
+#include "PauseMenu.h"
 #include "Core.h"
 
 namespace Meta {
@@ -13,8 +13,8 @@ namespace Meta {
     {
     private:
         //Variables
-        Player* player;
-        std::stack<Tilemap*> tilemaps;
+        std::unique_ptr<Player> player;
+        std::stack<std::shared_ptr<Tilemap>> tilemaps;
         PauseMenu pauseMenu;
         bool pause;
         float timer;
@@ -26,16 +26,16 @@ namespace Meta {
         void initKeyBinds(std::map<std::string, int>* supported_keys);
         void changeMap();
     public:
-        GameState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys);
+        GameState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states, std::map<std::string, int>* supported_keys);
         virtual ~GameState();
 
 
 
         //Functions
-        void endState(std::stack<State*>* states);
+        void endState();
         void updatePlayerInput(const float& dt);
         void update(const float& dt);
-        void render(sf::RenderWindow* window);
+        void render();
     };
 
 }

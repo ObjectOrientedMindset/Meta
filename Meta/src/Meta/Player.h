@@ -1,7 +1,9 @@
 #pragma once
 #include "Entities.h"
-#include"AnimationComponent.h"
+#include "AnimationComponent.h"
 #include "Core.h"
+
+
 
 namespace Meta {
 
@@ -17,7 +19,7 @@ namespace Meta {
 		float timerMax;
 		float posX;
 		float posY;
-		AnimationComponent* playerAnimations;
+		AnimationComponent playerAnimations;
 		void initPlayerFromFile();
 
 	public:
@@ -30,7 +32,7 @@ namespace Meta {
 		const sf::Vector2f& getPlayerPosition();
 		void setPlayerPosition(float x, float y);
 		void update();
-		void render(sf::RenderTarget* target);
+		void render(std::shared_ptr<sf::RenderWindow> target);
 	};
 
 }

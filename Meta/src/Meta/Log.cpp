@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Log.h"
 
+
 namespace Meta {
 
 	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;

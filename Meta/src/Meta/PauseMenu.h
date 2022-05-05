@@ -1,8 +1,6 @@
 #pragma once
-#include"Button.h"
-#include"State.h"
-#include"Player.h"
-#include"Tilemap.h"
+#include "State.h"
+#include "Tilemap.h"
 #include "Core.h"
 
 namespace Meta {
@@ -13,14 +11,14 @@ namespace Meta {
 		//Variables
 		sf::RectangleShape background;
 		sf::Text text;
-		std::vector<Button*> button;
+		std::vector<std::shared_ptr<Button>> buttons;
 	public:
-		PauseMenu(sf::RenderWindow& window, sf::Font& font);
+		PauseMenu(const sf::RenderWindow& window, sf::Font& font);
 		~PauseMenu();
-
+		
 		//Functions
-		bool update(const sf::Vector2f mousePos, std::stack<State*>* states);
-		void render(sf::RenderWindow* window);
+		bool update(const sf::Vector2f mousePos, std::stack<std::shared_ptr<State>>* states);
+		void render(std::shared_ptr<sf::RenderWindow> window);
 	};
 
 }

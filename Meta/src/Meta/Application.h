@@ -1,8 +1,7 @@
 #pragma once
 #include "State.h"
+#include "Window.h"
 #include "Core.h"
-#include "MainMenu.h"
-
 
 namespace Meta {
 
@@ -14,11 +13,9 @@ namespace Meta {
 		float dt;
 
 		//Variables
-		sf::RenderWindow* window;
-		sf::Event e;
-		
+		std::shared_ptr<Window> window;
 		//States
-		std::stack<State*> state;
+		std::stack<std::shared_ptr<State>> states;
 		std::map<std::string, int> supportedKeys;
 
 		void initWindow();
@@ -31,7 +28,6 @@ namespace Meta {
 		//Functions
 		void initStates();
 		void updateDt();
-		void pollEvents();
 		void update();
 		void render();
 		void run();

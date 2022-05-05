@@ -2,30 +2,31 @@
 #include "EditorState.h"
 
 
+
 namespace Meta {
 
-	EditorState::EditorState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys)
-		:State(window, states, supported_keys), pmenu(*window, this->pixelFont)
+	EditorState::EditorState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states, std::map<std::string, int>* supported_keys)
+		:State(window, states, supported_keys), pmenu(*window->getWindow(), pixelFont)
 	{
-		this->tilemaps.push(new Tilemap());
-		this->filePathCount = 1;
-		this->filePathCountMax = 10;
-		this->initKeyBinds(supported_keys);
-		this->pause = false;
-		this->timerMax = 1000.f;
-		this->timer = 0.f;
-		this->mouseCoordinatesText_x.setFont(this->pixelFont);
-		this->mouseCoordinatesText_x.setCharacterSize(20);
-		this->mouseCoordinatesText_y.setFont(this->pixelFont);
-		this->mouseCoordinatesText_y.setCharacterSize(20);
-		this->tileCollision.setPosition(this->getMousePos().x - 50.f, this->getMousePos().y - 50.f);
-		this->tileCollision.setFillColor(sf::Color(0, 255, 0, 75));
-		this->tileCollision.setSize(sf::Vector2f(this->tilemaps.top()->maxSize));
-		this->tileCode = 1;
-		this->text.setFont(this->pixelFont);
-		this->text.setPosition(100.f, 100.f);
-		this->text.setFillColor(sf::Color(100, 100, 255, 255));
-		this->initEditMap();
+		tilemaps.push(std::make_shared<Tilemap>());
+		filePathCount = 1;
+		filePathCountMax = 10;
+		initKeyBinds(supported_keys);
+		pause = false;
+		timerMax = 1000.f;
+		timer = 0.f;
+		mouseCoordinatesText_x.setFont(pixelFont);
+		mouseCoordinatesText_x.setCharacterSize(20);
+		mouseCoordinatesText_y.setFont(pixelFont);
+		mouseCoordinatesText_y.setCharacterSize(20);
+		tileCollision.setPosition(getMousePos().x - 50.f, getMousePos().y - 50.f);
+		tileCollision.setFillColor(sf::Color(0, 255, 0, 75));
+		tileCollision.setSize(sf::Vector2f(tilemaps.top()->maxSize));
+		tileCode = 1;
+		text.setFont(pixelFont);
+		text.setPosition(100.f, 100.f);
+		text.setFillColor(sf::Color(100, 100, 255, 255));
+		initEditMap();
 	}
 
 
@@ -37,34 +38,34 @@ namespace Meta {
 		if (!keys_file.is_open()) { MT_CORE_ERROR("Config/gamestate_keys.ini missing!"); }
 		while (keys_file >> key >> key_digit)
 		{
-			this->keybinds[key] = supported_keys->at(key_digit);
+			keybinds[key] = supported_keys->at(key_digit);
 		}
 	}
 	void EditorState::initEditMap()
 	{   //Invisible map for editing the real tilemap
-		for (int x = 0; x < (this->window->getSize().x / 100) + 1; x++)
+		for (int x = 0; x < (window->getWindow()->getSize().x / 100) + 1; x++)
 		{
-			this->editmap.push_back(std::vector<sf::RectangleShape>());
-			for (int y = 0; y < (this->window->getSize().y / 100) + 1; y++)
+			editmap.push_back(std::vector<sf::RectangleShape>());
+			for (int y = 0; y < (window->getWindow()->getSize().y / 100) + 1; y++)
 			{
-				this->editmap[x].push_back(sf::RectangleShape(sf::Vector2f(this->tilemaps.top()->maxSize)));
-				this->editmap[x][y].setPosition(x * 100, y * 100);
+				editmap[x].push_back(sf::RectangleShape(sf::Vector2f(tilemaps.top()->maxSize)));
+				editmap[x][y].setPosition(x * 100, y * 100);
 			}
 		}
 	}
 	void EditorState::addTile(const sf::Vector2f& tile)
 	{
-		this->tilemaps.top()->update(tile, this->tileCode, this->tileLayer);
+		tilemaps.top()->update(tile, tileCode, tileLayer);
 	}
 	void EditorState::deleteTile(const sf::Vector2f& tile)
 	{
-		this->tilemaps.top()->update(tile, this->tileCode, this->tileLayer);
+		tilemaps.top()->update(tile, tileCode, tileLayer);
 	}
 	bool EditorState::tileCollisionCheck(const int& tile_layer)
 	{
-		for (auto& t : this->tilemaps.top()->tile[tile_layer])
+		for (auto& t : tilemaps.top()->tiles[tile_layer])
 		{    // Check if editmap rectangle position and tile position 
-			if (this->getEditMapCollisionCheck() == t->getTilePosition())
+			if (getEditMapCollisionCheck() == t->getTilePosition())
 			{
 				return true;
 			}
@@ -73,13 +74,13 @@ namespace Meta {
 	}
 	const sf::Vector2f& EditorState::getEditMapCollisionCheck()
 	{ // checking which one of the invisible tiles and return its Vector2f
-		for (int x = 0; x < (this->window->getSize().x / 100) + 1; x++)
+		for (int x = 0; x < (window->getWindow()->getSize().x / 100) + 1; x++)
 		{
-			for (int y = 0; y < (this->window->getSize().y / 100) + 1; y++)
+			for (int y = 0; y < (window->getWindow()->getSize().y / 100) + 1; y++)
 			{
-				if (this->editmap[x][y].getGlobalBounds().contains(this->getMousePos()))
+				if (editmap[x][y].getGlobalBounds().contains(getMousePos()))
 				{
-					return this->editmap[x][y].getPosition();
+					return editmap[x][y].getPosition();
 				}
 			}
 		}
@@ -88,65 +89,66 @@ namespace Meta {
 	}
 	void EditorState::updateMouseCoordinates()
 	{
-		this->mouseCoordinatesText_x.setPosition(this->getMousePos().x + 10.f, this->getMousePos().y - 20.f);
-		this->mouseCoordinatesText_x.setString(std::to_string((int)(this->getMousePos().x)));
-		this->mouseCoordinatesText_y.setPosition(this->getMousePos().x + 40.f, this->getMousePos().y - 20.f);
-		this->mouseCoordinatesText_y.setString(std::to_string((int)(this->getMousePos().y)));
+		mouseCoordinatesText_x.setPosition(getMousePos().x + 10.f, getMousePos().y - 20.f);
+		mouseCoordinatesText_x.setString(std::to_string((int)(getMousePos().x)));
+		mouseCoordinatesText_y.setPosition(getMousePos().x + 40.f, getMousePos().y - 20.f);
+		mouseCoordinatesText_y.setString(std::to_string((int)(getMousePos().y)));
 	}
 
 	void EditorState::changetileCode()
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 		{
-			this->tileCode = 0;
-			this->tileLayer = 1;
-			this->text.setString("ADD MODE(GRASS)");
+			tileCode = 0;
+			tileLayer = 1;
+			text.setString("ADD MODE(GRASS)");
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
 		{
-			this->tileCode = 1;
-			this->tileLayer = 1;
-			this->text.setString("ADD MODE(GRASS&FLOWER)");
+			tileCode = 1;
+			tileLayer = 1;
+			text.setString("ADD MODE(GRASS&FLOWER)");
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
 		{
-			this->tileCode = 2;
-			this->tileLayer = 1;
-			this->text.setString("ADD MODE(STONEGROUND)");
+			tileCode = 2;
+			tileLayer = 1;
+			text.setString("ADD MODE(STONEGROUND)");
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
 		{
-			this->tileCode = 3;
-			this->tileLayer = 0;
-			this->text.setString("ADD MODE(TREE)");
+			tileCode = 3;
+			tileLayer = 0;
+			text.setString("ADD MODE(TREE)");
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) //delete tile mode
 		{
-			this->tileCode = 4;
-			this->text.setString("DELETE MODE");
+			tileCode = 4;
+			text.setString("DELETE MODE");
 		}
 	}
 
 	void EditorState::changeMap()
 	{   //check for max files and key press for map change
-		if (this->timer >= this->timerMax)
+		if (timer >= timerMax)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			{
-				if (this->filePathCount < this->filePathCountMax)
+				if (filePathCount < filePathCountMax)
 				{
-					this->tilemaps.push(new Tilemap(this->filePathway[this->filePathCount]));
-					++this->filePathCount;
-					this->timer = 0.f;
+					tilemaps.push(std::make_shared<Tilemap>
+						(filePathway[filePathCount]));
+					++filePathCount;
+					timer = 0.f;
 				}
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 			{
-				if (this->filePathCount > 1)
+				if (filePathCount > 1)
 				{
-					this->tilemaps.pop();
-					--this->filePathCount;
-					this->timer = 0.f;
+					tilemaps.pop();
+					--filePathCount;
+					timer = 0.f;
 				}
 			}
 		}
@@ -154,82 +156,81 @@ namespace Meta {
 
 	EditorState::~EditorState()
 	{
-		while (!this->tilemaps.empty()) {
-			delete this->tilemaps.top();
-			this->tilemaps.pop();
+		while (!tilemaps.empty()) {
+			tilemaps.pop();
 		}
 	}
 
-	void EditorState::endState(std::stack<State*>* states)
+	void EditorState::endState()
 	{
-		if (this->timer >= this->timerMax)
+		if (timer >= timerMax)
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keybinds.at("CLOSE"))))
 			{
-				if (!this->pause)
+				if (!pause)
 				{
-					this->pause = true;
+					pause = true;
 				}
 				else
 				{
-					this->pause = false;
+					pause = false;
 				}
-				this->timer = 0.f;
+				timer = 0.f;
 			}
 		}
 	}
 
 	void EditorState::update(const float& dt)
 	{
-		this->endState(this->states);
-		if (!this->pause) // Unpaused update
+		endState();
+		if (!pause) // Unpaused update
 		{
 			// update coordinates and tileCollision
-			this->changeMap();
-			this->updateMouseCoordinates();
-			this->tileCollision.setPosition(this->getMousePos().x - 50.f, this->getMousePos().y - 50.f);
-			this->changetileCode();
+			changeMap();
+			updateMouseCoordinates();
+			tileCollision.setPosition(getMousePos().x - 50.f, getMousePos().y - 50.f);
+			changetileCode();
 			// check for mouse click and tile collision addtile
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				if (this->timer >= this->timerMax)
+				if (timer >= timerMax)
 				{
-					if (!this->tileCollisionCheck(this->tileLayer))
+					if (!tileCollisionCheck(tileLayer))
 					{  //add tile
-						this->addTile(this->getEditMapCollisionCheck());
-						this->timer = 0.f;
+						addTile(getEditMapCollisionCheck());
+						timer = 0.f;
 					}
-					else if (this->tileCode == 4)
+					else if (tileCode == 4)
 					{ //delete tile
-						this->deleteTile(this->getEditMapCollisionCheck());
-						this->timer = 0.f;
+						deleteTile(getEditMapCollisionCheck());
+						timer = 0.f;
 					}
 				}
 			}
 		}
 		else
 		{    // if pmenu return true savetilemap
-			if (this->pmenu.update(this->getMousePos(), this->states))
+			if (pmenu.update(getMousePos(), states))
 			{
-				this->tilemaps.top()->saveTileMap(this->filePathway[this->filePathCount - 1]);
+				tilemaps.top()->saveTileMap(filePathway[filePathCount - 1]);
 			}
 		}
-		++this->timer;
+		++timer;
 	}
 
-	void EditorState::render(sf::RenderWindow* window)
+	void EditorState::render()
 	{
-		if (this->pause)
+		if (pause)
 		{
-			this->pmenu.render(window);
+			pmenu.render(window->getWindow());
 		}
 		else
 		{
-			this->tilemaps.top()->render(window);
-			window->draw(this->tileCollision);
-			window->draw(this->mouseCoordinatesText_x);
-			window->draw(this->mouseCoordinatesText_y);
-			window->draw(this->text);
+			tilemaps.top()->render(window->getWindow());
+			window->getWindow()->draw(tileCollision);
+			window->getWindow()->draw(mouseCoordinatesText_x);
+			window->getWindow()->draw(mouseCoordinatesText_y);
+			window->getWindow()->draw(text);
 		}
 	}
 

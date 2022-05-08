@@ -23,22 +23,26 @@ project "Meta"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-	pchheader "pch.h"
-	pchsource "Meta/src/Meta/pch.cpp"
+	pchheader "mtpch.h"
+	pchsource "Meta/src/mtpch.cpp"
 
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/imgui/*.h",
+		"%{prj.name}/vendor/imgui/*.cpp"
 	}
 
 	includedirs
 	{
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/SFML/include",
-		"Meta/vendor/Glad/include"
+		"%{prj.name}/vendor/Glad/include",
+		"%{prj.name}/vendor",
+		"%{prj.name}/src"
 	}
-
+	
 	libdirs
 	{
 		"%{prj.name}/vendor/SFML/lib",
@@ -52,7 +56,7 @@ project "Meta"
 	}
 
 	filter "system:windows"
-		cppdialect "c++17"
+		cppdialect "c++20"
 		staticruntime "On"
 		systemversion "latest"
 
@@ -136,7 +140,7 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "c++17"
+		cppdialect "c++20"
 		staticruntime "On"
 		systemversion "latest"
 

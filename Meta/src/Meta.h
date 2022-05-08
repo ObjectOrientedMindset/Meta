@@ -1,8 +1,8 @@
 #pragma once
 
 //For sandbox apps to use
-#include "Meta/Application.h"
-#include "Meta/Log.h"
+#include "Meta/Base/Application.h"
+#include "Meta/Base/Log.h"
 
 
 
@@ -11,4 +11,4 @@
 
 //Entry point
 
-#include "Meta/main.h"
+#include "Meta/Base/main.h"

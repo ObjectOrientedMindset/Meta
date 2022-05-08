@@ -1,6 +1,6 @@
 #include "pch.h"
-#include <Meta.h>
 
+#include <Meta.h>
 
 
 class Game : public Meta::Application

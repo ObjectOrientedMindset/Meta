@@ -13,6 +13,7 @@ namespace Meta {
 	{
 		//Initialize Game window
 		window = std::make_shared<Window>(Window::windowData());
+		
 	}
 
 	Application::Application()
@@ -39,7 +40,7 @@ namespace Meta {
 
 	void Application::update()
 	{
-		ImGui::SFML::Update(*window->getRenderWindow(), dtClock.restart());
+		ImGui::SFML::Update(*window->renderWindow, dtClock.restart());
 		
 
 		if (states.empty() == false)
@@ -49,14 +50,14 @@ namespace Meta {
 		//Application end
 		else
 		{
-			window->getRenderWindow()->close();
+			window->renderWindow->close();
 		}
 		
 	}
 	
 	void Application::render()
 	{
-		window->getRenderWindow()->clear();
+		window->renderWindow->clear();
 		
 
 		if (states.empty() == false)
@@ -65,13 +66,13 @@ namespace Meta {
 		}
 
 
-		ImGui::SFML::Render(*window->getRenderWindow());
-		window->getRenderWindow()->display();
+		ImGui::SFML::Render(*window->renderWindow);
+		window->renderWindow->display();
 	}
 
 	void Application::run()
 	{
-		while (window->getRenderWindow()->isOpen())
+		while (window->renderWindow->isOpen())
 		{
 			updateDt();
 			window->pollEvents();

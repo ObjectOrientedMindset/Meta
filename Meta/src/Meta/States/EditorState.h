@@ -17,24 +17,32 @@ namespace Meta {
         Gui gui;
         PauseMenu pmenu;
         std::shared_ptr<Tilemap> tilemap;
-        bool pause;
+        bool pause = false;
         sf::Text mouseCoordinatesText_x;
         sf::Text mouseCoordinatesText_y;
         sf::RectangleShape tileCollision;
         sf::RectangleShape editMapRectangle;
         std::vector<std::vector<sf::RectangleShape>> editmap;
-        int tileCode;
+        unsigned int tileCode = 1;
         int tileLayer;
         sf::Text text;
+        float mouseX;
+        float mouseY;
+        sf::Cursor cursorArrow;
+        sf::Cursor cursorHand;
+        unsigned int timerMax = 100;
+        unsigned int timer = timerMax;
+        sf::Vector2f tilePosition = sf::Vector2f(0.f,0.f);
 
         //Functions
         void initEditMap();
-        void addTile(const sf::Vector2f& tile);
-        void deleteTile(const sf::Vector2f& tile);
-        bool tileCollisionCheck(const int& tile_layer);
-        const sf::Vector2f& getEditMapCollisionCheck();
+        void addTile(sf::Vector2f tile);
+        void deleteTile(sf::Vector2f tile);
+        void tileCollisionCheck();
+        bool editMapCollisionCheck();
         void updateMouseCoordinates();
         void changetileCode();
+        void camera();
     public:
         EditorState(std::shared_ptr<Window> window,
         std::stack<std::shared_ptr<State>>* states);

@@ -20,10 +20,11 @@ namespace Meta {
 		shutdown();
 	}
 
+
 	void Window::shutdown()
 	{
 		ImGui::SFML::Shutdown();
-		window->close();
+		renderWindow->close();
 	}
 
 	void Window::loadFiles()
@@ -37,16 +38,26 @@ namespace Meta {
 
 	void Window::initWindow()
 	{
-		window = std::make_shared<sf::RenderWindow>(
+#ifdef MT_PLATFORM_WINDOWS
+
+		renderWindow = std::make_shared<sf::RenderWindow>(
 			sf::VideoMode(w_Data.width, w_Data.height)
-			, w_Data.title, sf::Style::Close | sf::Style::Titlebar);
+			, w_Data.title, sf::Style::Close | sf::Style::Titlebar
+			| sf::Style::Resize);
 
-		if (window->isOpen()) MT_CORE_INFO("Window initialized!");
+		if (renderWindow->isOpen()) MT_CORE_INFO("Window initialized!");
 
-		if(!pixelFont.loadFromFile("Fonts/PixellettersFull.ttf")) MT_CORE_ERROR("Fonts/PixellettersFull.ttf Loading Failed!");
+		if (!pixelFont.loadFromFile("Fonts/PixellettersFull.ttf")) MT_CORE_ERROR("Fonts/PixellettersFull.ttf Loading Failed!");
+		//ImGui Init
+		if (!ImGui::SFML::Init(*renderWindow)) MT_CORE_FATAL("ImGui Initialization Failed!");
+		//sf View
+		view = sf::View(renderWindow->getDefaultView().getCenter(), renderWindow->getDefaultView().getSize());
 
-		if(!ImGui::SFML::Init(*window)) MT_CORE_FATAL("ImGui Initialization Failed!");
-	
+		mousePositionOffset = sf::Vector2f(0.f, 0.f);
+#else
+		 MT_CORE_FATAL("Unkown operating system!");
+#endif 
+
 	}
 
 
@@ -55,28 +66,26 @@ namespace Meta {
 		//reset the current event
 		currentEvent.eventType = sf::Event::EventType();
 		currentEvent.mouseClicked = false;
-		currentEvent.mousePosition = sf::Vector2f(sf::Mouse::getPosition(*window));
+		currentEvent.mousePosition = sf::Vector2f(sf::Mouse::getPosition(*renderWindow));
 		currentEvent.changed = false;
 		currentEvent.input = '\0';
-		while (window->pollEvent(e))
+		while (renderWindow->pollEvent(e))
 		{
-			ImGui::SFML::ProcessEvent(*window, e);
+			ImGui::SFML::ProcessEvent(*renderWindow, e);
 			switch (e.type)
 			{
 			case sf::Event::Closed:
-				window->close();
+				renderWindow->close();
 				break;
 			case sf::Event::MouseButtonPressed:
 				currentEvent.eventType = sf::Event::MouseButtonPressed;
 				currentEvent.mouseClicked = true;
-				currentEvent.mousePosition = sf::Vector2f(sf::Mouse::getPosition(*window));
 				currentEvent.changed = true;
 				currentEvent.input = '\0';
 				break;
 			case sf::Event::MouseMoved:
 				currentEvent.eventType = sf::Event::MouseMoved;
 				currentEvent.mouseClicked = false;
-				currentEvent.mousePosition = sf::Vector2f(sf::Mouse::getPosition(*window));
 				currentEvent.changed = true;
 				currentEvent.input = '\0';
 				break;
@@ -85,7 +94,6 @@ namespace Meta {
 				{
 					currentEvent.eventType = sf::Event::TextEntered;
 					currentEvent.mouseClicked = false;
-					currentEvent.mousePosition = sf::Vector2f(sf::Mouse::getPosition(*window));
 					currentEvent.changed = true;
 					currentEvent.input = static_cast<char>(e.text.unicode);
 				}
@@ -99,18 +107,17 @@ namespace Meta {
 	}
 
 
-	std::shared_ptr<sf::RenderWindow> Window::getRenderWindow()
+	void Window::moveView(const float& x, const float& y)
 	{
-#ifdef MT_PLATFORM_WINDOWS
-		
-		return window;
-#else
-		return MT_CORE_FATAL("Unkown operating system!");
-		return nullptr;
-#endif 
-		
+		mousePositionOffset.x += x; mousePositionOffset.y += y;
+
+		view.move(x, y);
+
+		renderWindow->setView(view);
 	}
-
-
+	sf::Vector2f Window::getAppMousePosition()
+	{
+		return currentEvent.mousePosition + mousePositionOffset;
+	}
 }
 

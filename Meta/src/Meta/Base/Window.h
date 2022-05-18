@@ -7,14 +7,14 @@ namespace Meta {
 	class META_API Window
 	{
 	private:
-		std::shared_ptr<sf::RenderWindow> window;
 		sf::Event e;
 
 		struct Event
 		{
-			sf::Event::EventType eventType;
-			sf::Vector2f mousePosition;
-			char input;
+			sf::Event::EventType eventType = sf::Event::EventType();
+			sf::Vector2f mousePosition = sf::Vector2f(0.f, 0.f);
+			sf::Vector2f inAppMousePosition = sf::Vector2f(0.f, 0.f);
+			char input = '\0';
 			bool mouseClicked = false;
 			bool changed = false;
 		};
@@ -33,22 +33,30 @@ namespace Meta {
 		};
 	private:
 		windowData w_Data;
-
+		sf::Vector2f mousePositionOffset;
 	public:
 		Event currentEvent;
 		sf::Font pixelFont;
 		std::string filePathway[5];
+		sf::View view;
+		std::shared_ptr<sf::RenderWindow> renderWindow;
 
 		Window(const windowData& data = windowData());
 		~Window();
 
-		void pollEvents();
-		std::shared_ptr<sf::RenderWindow> getRenderWindow();
-	
+		
 	private:
+
 		void shutdown();
 		void initWindow();
 		void loadFiles();
+
+	public:
+
+		void pollEvents();
+		void moveView(const float& x, const float& y);
+		sf::Vector2f getAppMousePosition();
+
 	};
 
 

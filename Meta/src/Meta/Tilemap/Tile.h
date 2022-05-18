@@ -17,7 +17,7 @@ namespace Meta {
 		Tile(const float& posX, const float& posY, const sf::Vector2f& size, const int& tile_code, const int& tile_layer);
 		virtual ~Tile();
 
-		const sf::Vector2f& getTilePosition();
+		sf::Vector2f getTilePosition();
 		const int getTileCode();
 		const int getTileLayer();
 		void update();

@@ -17,16 +17,19 @@ namespace Meta {
 	}
 
 	void Gui::pauseMenu(std::shared_ptr<Window> window, std::shared_ptr<Tilemap> tilemap,
-						std::stack<std::shared_ptr<State>>* states)
+		std::stack<std::shared_ptr<State>>* states)
 	{
 		//Editor Pause Menu GUI
-		if(!ImGui::Begin("PauseMenu")) MT_CORE_ERROR("ImGui::Begin Failed!");
+		if (!ImGui::Begin("PauseMenu")) MT_CORE_ERROR("ImGui::Begin Failed!");
 
 		if (ImGui::Button("Save", ImVec2(120.f, 25.f)))
 			tilemap->saveTileMap();
-				
+
 		if (ImGui::Button("Quit", ImVec2(120.f, 25.f)))
+		{
+			window->renderWindow->setView(window->renderWindow->getDefaultView());
 			states->pop();
+		}
 
 		ImGui::End();
 	}

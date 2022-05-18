@@ -29,7 +29,7 @@ namespace Meta {
 	{
 	}
 
-	const sf::Vector2f& Tile::getTilePosition()
+	sf::Vector2f Tile::getTilePosition()
 	{
 		return sprite.getPosition();
 	}

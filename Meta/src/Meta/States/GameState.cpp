@@ -5,7 +5,7 @@
 namespace Meta {
 
 	GameState::GameState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states)
-		:State(window, states), pauseMenu(*window->getRenderWindow(), window->pixelFont)
+		:State(window, states), pauseMenu(*window->renderWindow, window->pixelFont)
 	{
 		tilemap = std::make_shared<Tilemap>();
 		filePathCount = 1;
@@ -74,11 +74,11 @@ namespace Meta {
 
 	void GameState::render()
 	{
-		tilemap->render(window->getRenderWindow());
-		player->render(window->getRenderWindow());
+		tilemap->render(window->renderWindow);
+		player->render(window->renderWindow);
 		if (pause)
 		{
-			pauseMenu.render(window->getRenderWindow());
+			pauseMenu.render(window->renderWindow);
 		}
 
 	}

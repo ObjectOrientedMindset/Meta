@@ -7,10 +7,9 @@ namespace Meta {
 
 
 	EditorState::EditorState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states)
-		:State(window, states), pmenu(*window->getRenderWindow(), window->pixelFont), gui()
+		:State(window, states), pmenu(*window->renderWindow, window->pixelFont), gui()
 	{
 		tilemap = std::make_shared<Tilemap>();
-		pause = false;
 		mouseCoordinatesText_x.setFont(window->pixelFont);
 		mouseCoordinatesText_x.setCharacterSize(20);
 		mouseCoordinatesText_y.setFont(window->pixelFont);
@@ -18,66 +17,117 @@ namespace Meta {
 		tileCollision.setPosition(window->currentEvent.mousePosition.x - 50.f, window->currentEvent.mousePosition.y - 50.f);
 		tileCollision.setFillColor(sf::Color(0, 255, 0, 75));
 		tileCollision.setSize(sf::Vector2f(tilemap->maxSize));
-		tileCode = 1;
 		text.setFont(window->pixelFont);
 		text.setPosition(100.f, 100.f);
 		text.setFillColor(sf::Color(100, 100, 255, 255));
 		initEditMap();
+		mouseX = window->currentEvent.mousePosition.x;
+		mouseY = window->currentEvent.mousePosition.y;
+		cursorHand.loadFromSystem(sf::Cursor::Hand);
+		cursorArrow.loadFromSystem(sf::Cursor::Arrow);
 	}
 
 
 	void EditorState::initEditMap()
-	{   //Invisible map for editing the real tilemap
-		for (int x = 0; x < (window->getRenderWindow()->getSize().x / 100) + 1; x++)
+	{
+		unsigned int iteratorX = 0;
+		unsigned int iteratorY = 0;
+		//Invisible map for editing the real tilemap
+		for (int x = static_cast<int>(window->renderWindow->getSize().y) / -10;
+			x < static_cast<int>(window->renderWindow->getSize().x) / 10; x++)
 		{
 			editmap.push_back(std::vector<sf::RectangleShape>());
-			for (int y = 0; y < (window->getRenderWindow()->getSize().y / 100) + 1; y++)
+			for (int y = static_cast<int>(window->renderWindow->getSize().y) / -10;
+				y < static_cast<int>(window->renderWindow->getSize().y) / 10; y++)
 			{
-				editmap[x].push_back(sf::RectangleShape(sf::Vector2f(tilemap->maxSize)));
-				editmap[x][y].setPosition(x * 100, y * 100);
+				editmap[iteratorX].push_back(sf::RectangleShape(sf::Vector2f(tilemap->maxSize)));
+				editmap[iteratorX][iteratorY].setPosition(x * 100, y * 100);
+				++iteratorY;
 			}
+			iteratorY = 0;
+			++iteratorX;
 		}
 	}
-	void EditorState::addTile(const sf::Vector2f& tile)
+	void EditorState::addTile(sf::Vector2f tile)
 	{
 		tilemap->update(tile, tileCode, tileLayer);
 	}
-	void EditorState::deleteTile(const sf::Vector2f& tile)
+	void EditorState::deleteTile(sf::Vector2f tile)
 	{
 		tilemap->update(tile, tileCode, tileLayer);
 	}
-	bool EditorState::tileCollisionCheck(const int& tile_layer)
-	{
-		for (auto& t : tilemap->tiles[tile_layer])
-		{    // Check if editmap rectangle position and tile position 
-			if (getEditMapCollisionCheck() == t->getTilePosition())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	const sf::Vector2f& EditorState::getEditMapCollisionCheck()
-	{ // checking which one of the invisible tiles and return its Vector2f
-		for (int x = 0; x < (window->getRenderWindow()->getSize().x / 100) + 1; x++)
+	void EditorState::tileCollisionCheck()
+	{ //Add and Delete Tiles 
+		bool existingTile = false;
+
+		if (tileCode == 4)
 		{
-			for (int y = 0; y < (window->getRenderWindow()->getSize().y / 100) + 1; y++)
+			for (auto& t : tilemap->tiles[0])
 			{
-				if (editmap[x][y].getGlobalBounds().contains(window->currentEvent.mousePosition))
+				if (tilePosition == t->getTilePosition())
 				{
-					return editmap[x][y].getPosition();
+					existingTile = true;
 				}
 			}
+			for (auto& t : tilemap->tiles[1])
+			{
+				if (tilePosition == t->getTilePosition())
+				{
+					existingTile = true;
+				}
+			} // if there is a tile delete
+			if (existingTile)
+			{
+				deleteTile(tilePosition);
+			}
+		}
+		else if (tileCode < 4)
+		{
+			for (auto& t : tilemap->tiles[tileLayer])
+			{
+				if (tilePosition == t->getTilePosition())
+				{
+					existingTile = true;
+				}
+			}   // if there isnt any tile add
+			if (!existingTile)
+			{
+				addTile(tilePosition);
+			}
+		}
+	}
+	bool EditorState::editMapCollisionCheck()
+	{
+		unsigned int iteratorX = 0;
+		unsigned int iteratorY = 0;
+		// check for any of the edit map tiles contain application mouse position
+		for (int x = static_cast<int>(window->renderWindow->getSize().y) / -10;
+			x < static_cast<int>(window->renderWindow->getSize().x) / 10; x++)
+		{
+			for (int y = static_cast<int>(window->renderWindow->getSize().y) / -10;
+				y < static_cast<int>(window->renderWindow->getSize().y) / 10; y++)
+			{
+				if (editmap[iteratorX][iteratorY].getGlobalBounds().contains(window->getAppMousePosition()))
+				{
+					tilePosition = editmap[iteratorX][iteratorY].getPosition();
+					return true;
+				}
+				++iteratorY;
+			}
+			iteratorY = 0;
+			++iteratorX;
 		}
 
-		return sf::Vector2f(0, 0);
+		MT_CORE_ERROR("Edit Map Collision Failed! \nConsider Increasing the Edit Map Size");
+
+		return false;
 	}
 	void EditorState::updateMouseCoordinates()
 	{
-		mouseCoordinatesText_x.setPosition(window->currentEvent.mousePosition.x + 10.f, window->currentEvent.mousePosition.y - 20.f);
-		mouseCoordinatesText_x.setString(std::to_string((int)(window->currentEvent.mousePosition.x)));
-		mouseCoordinatesText_y.setPosition(window->currentEvent.mousePosition.x + 40.f, window->currentEvent.mousePosition.y - 20.f);
-		mouseCoordinatesText_y.setString(std::to_string((int)(window->currentEvent.mousePosition.y)));
+		mouseCoordinatesText_x.setPosition(window->getAppMousePosition().x + 10.f, window->getAppMousePosition().y - 20.f);
+		mouseCoordinatesText_x.setString(std::to_string(static_cast<int>(window->getAppMousePosition().x)));
+		mouseCoordinatesText_y.setPosition(window->getAppMousePosition().x + 40.f, window->getAppMousePosition().y - 20.f);
+		mouseCoordinatesText_y.setString(std::to_string(static_cast<int>(window->getAppMousePosition().y)));
 	}
 
 	void EditorState::changetileCode()
@@ -111,6 +161,30 @@ namespace Meta {
 		}
 	}
 
+	void EditorState::camera()
+	{ // check if mouse position changed if so move the view
+		if (window->currentEvent.mousePosition.x < mouseX)
+		{
+			window->moveView(2.5f, 0.f);
+		}
+		else if (window->currentEvent.mousePosition.x > mouseX)
+		{
+			window->moveView(-2.5f, 0.f);
+		}
+
+		if (window->currentEvent.mousePosition.y < mouseY)
+		{
+			window->moveView(0.f, 2.5f);
+		}
+		else if (window->currentEvent.mousePosition.y > mouseY)
+		{
+			window->moveView(0.f, -2.5f);
+		}
+
+		mouseX = window->currentEvent.mousePosition.x;
+		mouseY = window->currentEvent.mousePosition.y;
+	}
+
 	EditorState::~EditorState()
 	{
 	}
@@ -127,42 +201,52 @@ namespace Meta {
 	void EditorState::update(const float& dt)
 	{
 		endState();
-		if (window->currentEvent.changed)
-		{	
-			if (!pause) // Unpaused update
+		if (!pause) // Unpaused update
+		{
+			//Camera move
+			sf::Mouse::isButtonPressed(sf::Mouse::Button::Middle) == true ?
+				window->renderWindow->setMouseCursor(cursorHand), camera() :
+				window->renderWindow->setMouseCursor(cursorArrow);
+
+			if (window->currentEvent.changed)
 			{
 				// update coordinates and tileCollision
 				updateMouseCoordinates();
-				tileCollision.setPosition(window->currentEvent.mousePosition.x - 50.f, window->currentEvent.mousePosition.y - 50.f);
+				tileCollision.setPosition(window->getAppMousePosition().x - 50.f, window->getAppMousePosition().y - 50.f);
 				changetileCode();
+
 				// check for mouse click and tile collision addtile
-				if (window->currentEvent.mouseClicked)
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 				{
-					if (!tileCollisionCheck(tileLayer))
-					{  //add tile
-						addTile(getEditMapCollisionCheck());
-
-					}
-					else if (tileCode == 4)
-					{ //delete tile
-						deleteTile(getEditMapCollisionCheck());
-
+					if (timer >= timerMax)
+					{
+						if (editMapCollisionCheck())
+						{
+							tileCollisionCheck();
+						}
+						timer = 0;
 					}
 				}
 			}
+
 		}
-		pause == false ? gui.editorState() : gui.pauseMenu(window, tilemap, states);
+		// Pause EditorState
+		pause == false ? gui.editorState() :
+			gui.pauseMenu(window, tilemap, states);
+
+
+		++timer;
 	}
 
 	void EditorState::render()
 	{
 		if (!pause)
 		{
-			tilemap->render(window->getRenderWindow());
-			window->getRenderWindow()->draw(tileCollision);
-			window->getRenderWindow()->draw(mouseCoordinatesText_x);
-			window->getRenderWindow()->draw(mouseCoordinatesText_y);
-			window->getRenderWindow()->draw(text);
+			tilemap->render(window->renderWindow);
+			window->renderWindow->draw(tileCollision);
+			window->renderWindow->draw(mouseCoordinatesText_x);
+			window->renderWindow->draw(mouseCoordinatesText_y);
+			window->renderWindow->draw(text);
 		}
 
 	}

@@ -37,22 +37,30 @@ namespace Meta {
 	public:
 		Event currentEvent;
 		sf::Font pixelFont;
-		std::string filePathway[5];
+		std::vector<std::string> characterFilePaths;
+		std::vector<std::string> tileFilePaths;
+		std::vector<std::string> backgroundFilePaths;
 		sf::View view;
 		std::shared_ptr<sf::RenderWindow> renderWindow;
+
+
 
 		Window(const windowData& data = windowData());
 		~Window();
 
 		
 	private:
-
 		void shutdown();
 		void initWindow();
 		void loadFiles();
-
+	
 	public:
-
+		void saveCharacterFile(const std::string& filePath);
+		void deleteCharacterFile(const int& index);
+		void saveTileFile(const std::string& filePath);
+		void deleteTileFile(const int& index);
+		void saveBackgroundFile(const std::string& filePath);
+		void deleteBackgroundFile(const int& index);
 		void pollEvents();
 		void moveView(const float& x, const float& y);
 		sf::Vector2f getAppMousePosition();

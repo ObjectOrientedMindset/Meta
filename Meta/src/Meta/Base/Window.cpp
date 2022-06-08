@@ -29,12 +29,134 @@ namespace Meta {
 
 	void Window::loadFiles()
 	{
-		filePathway[0] = "Config/maps/map0.ini";
-		filePathway[1] = "Config/maps/map1.ini";
-		filePathway[2] = "Config/maps/map2.ini";
-		filePathway[3] = "Config/maps/map3.ini";
-		filePathway[4] = "Config/maps/map4.ini";
+		std::string fileLocation;
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/character_locations.ini", std::ios::in);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/character_locations.ini missing!"); }
+		while (file_tilemap >> fileLocation)
+		{
+			characterFilePaths.push_back(fileLocation);
+		}
+		
+		file_tilemap.close();
+
+		file_tilemap.open("Config/tile_locations.ini", std::ios::in);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/tile_locations.ini missing!"); }
+		while (file_tilemap >> fileLocation)
+		{
+			tileFilePaths.push_back(fileLocation);
+		}
+
+		file_tilemap.close();
+
+		file_tilemap.open("Config/background_locations.ini", std::ios::in);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/background_locations.ini missing!"); }
+		while (file_tilemap >> fileLocation)
+		{
+			backgroundFilePaths.push_back(fileLocation);
+		}
+
+		file_tilemap.close();
+
+
 	}
+	void Window::saveCharacterFile(const std::string& filePath)
+	{
+		characterFilePaths.push_back(filePath);
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/character_locations.ini", std::ios::out);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/character_locations.ini missing!"); }
+		
+		for (size_t i = 0; i < characterFilePaths.size(); i++)
+		{
+			file_tilemap << characterFilePaths[i] << std::endl;
+		}
+
+
+		file_tilemap.close();
+	}
+
+	void Window::deleteCharacterFile(const int& index)
+	{
+		characterFilePaths.erase(characterFilePaths.begin() + index);
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/character_locations.ini", std::ios::out);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/character_locations.ini missing!"); }
+
+		for (size_t i = 0; i < characterFilePaths.size(); i++)
+		{
+			file_tilemap << characterFilePaths[i] << std::endl;
+		}
+
+
+		file_tilemap.close();
+	}
+
+	void Window::saveTileFile(const std::string& filePath)
+	{
+		tileFilePaths.push_back(filePath);
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/tile_locations.ini", std::ios::out);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/tile_locations.ini missing!"); }
+
+		for (size_t i = 0; i < tileFilePaths.size(); i++)
+		{
+			file_tilemap << tileFilePaths[i] << std::endl;
+		}
+
+
+		file_tilemap.close();
+	}
+
+	void Window::deleteTileFile(const int& index)
+	{
+		tileFilePaths.erase(tileFilePaths.begin() + index);
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/tile_locations.ini", std::ios::out);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/tile_locations.ini missing!"); }
+
+		for (size_t i = 0; i < tileFilePaths.size(); i++)
+		{
+			file_tilemap << tileFilePaths[i] << std::endl;
+		}
+
+
+		file_tilemap.close();
+	}
+
+	void Window::saveBackgroundFile(const std::string& filePath)
+	{
+		backgroundFilePaths.push_back(filePath);
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/background_locations.ini", std::ios::out);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/background_locations.ini missing!"); }
+
+		for (size_t i = 0; i < backgroundFilePaths.size(); i++)
+		{
+			file_tilemap << backgroundFilePaths[i] << std::endl;
+		}
+
+
+		file_tilemap.close();
+
+	}
+
+	void Window::deleteBackgroundFile(const int& index)
+	{
+		backgroundFilePaths.erase(backgroundFilePaths.begin() + index);
+		std::fstream file_tilemap;
+		file_tilemap.open("Config/background_locations.ini", std::ios::out);
+		if (!file_tilemap.is_open()) { MT_CORE_ERROR("Config/background_locations.ini missing!"); }
+
+		for (size_t i = 0; i < backgroundFilePaths.size(); i++)
+		{
+			file_tilemap << backgroundFilePaths[i] << std::endl;
+		}
+
+
+		file_tilemap.close();
+	}
+	
 
 	void Window::initWindow()
 	{
@@ -115,6 +237,7 @@ namespace Meta {
 
 		renderWindow->setView(view);
 	}
+	
 	sf::Vector2f Window::getAppMousePosition()
 	{
 		return currentEvent.mousePosition + mousePositionOffset;

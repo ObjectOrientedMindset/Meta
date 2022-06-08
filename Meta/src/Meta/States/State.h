@@ -3,7 +3,7 @@
 #include "Meta/GUI/Button.h"
 #include "Meta/Base/Window.h"
 
-// State Interface
+// State Abstract Class
 
 namespace Meta {
 
@@ -20,6 +20,7 @@ namespace Meta {
 		virtual ~State();
 
 		//Functions
+		virtual void endState() = 0;
 		virtual void update(const float& dt) = 0;
 		virtual void render() = 0;
 

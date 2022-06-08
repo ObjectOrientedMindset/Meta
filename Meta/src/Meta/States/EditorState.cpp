@@ -1,6 +1,5 @@
 #include "mtpch.h"
 #include "EditorState.h"
-#include "Meta/GUI/Gui.h"
 
 
 namespace Meta {
@@ -9,7 +8,7 @@ namespace Meta {
 	EditorState::EditorState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states)
 		:State(window, states), pmenu(*window->renderWindow, window->pixelFont), gui()
 	{
-		tilemap = std::make_shared<Tilemap>();
+		tilemap = std::make_shared<Tilemap>(window);
 		mouseCoordinatesText_x.setFont(window->pixelFont);
 		mouseCoordinatesText_x.setCharacterSize(20);
 		mouseCoordinatesText_y.setFont(window->pixelFont);
@@ -27,6 +26,10 @@ namespace Meta {
 		cursorArrow.loadFromSystem(sf::Cursor::Arrow);
 	}
 
+	EditorState::~EditorState()
+	{
+
+	}
 
 	void EditorState::initEditMap()
 	{
@@ -48,51 +51,60 @@ namespace Meta {
 			++iteratorX;
 		}
 	}
-	void EditorState::addTile(sf::Vector2f tile)
-	{
-		tilemap->update(tile, tileCode, tileLayer);
-	}
-	void EditorState::deleteTile(sf::Vector2f tile)
-	{
-		tilemap->update(tile, tileCode, tileLayer);
-	}
+
 	void EditorState::tileCollisionCheck()
 	{ //Add and Delete Tiles 
 		bool existingTile = false;
 
-		if (tileCode == 4)
+		if (gui.data.deleteMode)
 		{
-			for (auto& t : tilemap->tiles[0])
+			for (auto& t : tilemap->entities[1])
 			{
-				if (tilePosition == t->getTilePosition())
+				if (tilePosition == t->data.position)
 				{
 					existingTile = true;
 				}
 			}
-			for (auto& t : tilemap->tiles[1])
+			if (!existingTile)
 			{
-				if (tilePosition == t->getTilePosition())
+				for (auto& t : tilemap->entities[0])
 				{
-					existingTile = true;
+					if (tilePosition == t->data.position)
+					{
+						existingTile = true;
+					}
 				}
 			} // if there is a tile delete
 			if (existingTile)
 			{
-				deleteTile(tilePosition);
+				tilemap->deleteEntity(tilePosition);
 			}
 		}
-		else if (tileCode < 4)
+		else if (gui.data.addMode)
 		{
-			for (auto& t : tilemap->tiles[tileLayer])
+			for (auto& t : tilemap->entities[gui.data.layer])
 			{
-				if (tilePosition == t->getTilePosition())
+				if (tilePosition == t->data.position)
 				{
 					existingTile = true;
 				}
 			}   // if there isnt any tile add
 			if (!existingTile)
 			{
-				addTile(tilePosition);
+				if (gui.data.id == "Tile")
+				{
+					tilemap->addTile("Tile", tilePosition,
+						gui.data.code, gui.data.layer, window);
+				}
+				else if (gui.data.id == "Character")
+				{
+					tilemap->addCharacter("Character", tilePosition,
+						gui.data.code, gui.data.layer, window);
+				}
+				else if (gui.data.id == "Background")
+				{
+					//addBackground
+				}
 			}
 		}
 	}
@@ -130,36 +142,7 @@ namespace Meta {
 		mouseCoordinatesText_y.setString(std::to_string(static_cast<int>(window->getAppMousePosition().y)));
 	}
 
-	void EditorState::changetileCode()
-	{
-		switch (window->currentEvent.input)
-		{
-		case '1':
-			tileCode = 0;
-			tileLayer = 1;
-			text.setString("ADD MODE(GRASS)");
-			break;
-		case '2':
-			tileCode = 1;
-			tileLayer = 1;
-			text.setString("ADD MODE(GRASS&FLOWER)");
-			break;
-		case '3':
-			tileCode = 2;
-			tileLayer = 1;
-			text.setString("ADD MODE(STONEGROUND)");
-			break;
-		case '4':
-			tileCode = 3;
-			tileLayer = 0;
-			text.setString("ADD MODE(TREE)");
-			break;
-		case '5':
-			tileCode = 4;
-			text.setString("DELETE MODE");
-			break;
-		}
-	}
+
 
 	void EditorState::camera()
 	{ // check if mouse position changed if so move the view
@@ -183,10 +166,6 @@ namespace Meta {
 
 		mouseX = window->currentEvent.mousePosition.x;
 		mouseY = window->currentEvent.mousePosition.y;
-	}
-
-	EditorState::~EditorState()
-	{
 	}
 
 	void EditorState::endState()
@@ -213,40 +192,51 @@ namespace Meta {
 				// update coordinates and tileCollision
 				updateMouseCoordinates();
 				tileCollision.setPosition(window->getAppMousePosition().x - 50.f, window->getAppMousePosition().y - 50.f);
-				changetileCode();
 
 				// check for mouse click and tile collision addtile
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+				if (gui.data.addMode || gui.data.deleteMode)
 				{
-					if (timer >= timerMax)
+					if (!gui.data.newAssetExplorer)
 					{
-						if (editMapCollisionCheck())
+						if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 						{
-							tileCollisionCheck();
+							if (timer >= timerMax)
+							{
+								if (editMapCollisionCheck())
+								{
+									tileCollisionCheck();
+								}
+								timer = 0;
+							}
+							++timer;
 						}
-						timer = 0;
 					}
 				}
 			}
 
 		}
+		
 		// Pause EditorState
-		pause == false ? gui.editorState() :
+		pause == false ? gui.editorState(window) :
 			gui.pauseMenu(window, tilemap, states);
-
-
-		++timer;
 	}
 
 	void EditorState::render()
 	{
 		if (!pause)
 		{
-			tilemap->render(window->renderWindow);
-			window->renderWindow->draw(tileCollision);
-			window->renderWindow->draw(mouseCoordinatesText_x);
-			window->renderWindow->draw(mouseCoordinatesText_y);
-			window->renderWindow->draw(text);
+			tilemap->render();
+			if (gui.data.addMode || gui.data.deleteMode)
+			{
+				if (!gui.data.newAssetExplorer)
+				{
+					window->renderWindow->draw(tileCollision);
+					window->renderWindow->draw(mouseCoordinatesText_x);
+					window->renderWindow->draw(mouseCoordinatesText_y);
+					window->renderWindow->draw(text);
+				}
+			}
+
 		}
 
 	}

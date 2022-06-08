@@ -1,8 +1,9 @@
 #pragma once
 #include "State.h"
-#include "Meta/Base/Player.h"
-#include "Meta/Tilemap/Tilemap.h"
+#include "Meta/Entities/Player.h"
+#include "Meta/Entities/Tilemap.h"
 #include "Meta/GUI/PauseMenu.h"
+#include "Meta/GUI/Gui.h"
 
 namespace Meta {
 
@@ -12,13 +13,16 @@ namespace Meta {
     {
     private:
         //Variables
-        std::unique_ptr<Player> player;
         std::shared_ptr<Tilemap> tilemap;
+        Entity* player;
         PauseMenu pauseMenu;
+        Gui gui;
         bool pause;
         int filePathCount, filePathCountMax;
-        //Keybind
+        float posX;
+        float posY;
 
+        void camera();
     public:
         GameState(std::shared_ptr<Window> window,
         std::stack<std::shared_ptr<State>>* states);
@@ -27,10 +31,10 @@ namespace Meta {
 
 
         //Functions
-        void endState();
-        void updatePlayerInput(const float& dt);
-        void update(const float& dt);
-        void render();
+        bool updatePlayer(const float& dt);
+        void endState() override;
+        void update(const float& dt) override;
+        void render() override;
     };
 
 }

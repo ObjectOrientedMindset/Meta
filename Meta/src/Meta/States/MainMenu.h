@@ -20,9 +20,9 @@ namespace Meta {
         virtual ~MainMenu();
 
         //Functions
-        void endState();
-        void update(const float& dt);
-        void render();
+        void endState() override;
+        void update(const float& dt) override;
+        void render() override;
 
     };
 

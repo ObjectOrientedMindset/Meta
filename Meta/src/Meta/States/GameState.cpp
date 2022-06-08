@@ -3,17 +3,44 @@
 
 
 namespace Meta {
-
+	
 	GameState::GameState(std::shared_ptr<Window> window, std::stack<std::shared_ptr<State>>* states)
-		:State(window, states), pauseMenu(*window->renderWindow, window->pixelFont)
+		:State(window, states), pauseMenu(*window->renderWindow, window->pixelFont), gui()
 	{
-		tilemap = std::make_shared<Tilemap>();
+		tilemap = std::make_shared<Tilemap>(window);
+		player = tilemap->getPlayerInstance();
 		filePathCount = 1;
 		filePathCountMax = 5;
-		player = std::make_unique<Player>();
 		pause = false;
 	}
+	void GameState::camera()
+	{
+		if (player->data.position.x < posX)
+		{
+			window->moveView(-0.136f, 0.f);
+			
+		}
+		else if (player->data.position.x > posX)
+		{
+			window->moveView(0.136f, 0.f);
+			
+		}
 
+		if (player->data.position.y < posY)
+		{
+			window->moveView(0.f, -0.136f);
+		
+		}
+		else if (player->data.position.y > posY)
+		{
+			window->moveView(0.f, 0.136f);
+			
+		}	
+
+		posX = player->data.position.x;
+		posY = player->data.position.y;
+		
+	}
 
 	GameState::~GameState()
 	{
@@ -28,25 +55,30 @@ namespace Meta {
 		}
 	}
 
-	void GameState::updatePlayerInput(const float& dt)
+	bool GameState::updatePlayer(const float& dt)
 	{
+		bool moved = false;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
 		{
-			player->playerMovement("Left", -1.f, 0.f, dt);
+			player->update("Left", -1.f, 0.f, dt);
+			moved = true;			
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
 		{
-			player->playerMovement("Right", 1.f, 0.f, dt);
+			player->update("Right", 1.f, 0.f, dt);
+			moved = true;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
 		{
-			player->playerMovement("Up", 0.f, -1.f, dt);
+			player->update("Up", 0.f, -1.f, dt);
+			moved = true;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
 		{
-			player->playerMovement("Down", 0.f, 1.f, dt);
+			player->update("Down", 0.f, 1.f, dt);
+			moved = true;
 		}
-
+		return moved;
 	}
 
 	void GameState::update(const float& dt)
@@ -54,33 +86,26 @@ namespace Meta {
 		//unstable objects update(moving)
 		if (!pause)
 		{
-			updatePlayerInput(dt);
-			player->update();
+			if (updatePlayer(dt)) 
+			{
+				camera();
+			}
 		}
 		//stable objects update
 		if (window->currentEvent.changed)
 		{
 			endState();
-			if (!pause) 
-			{
-
-			}
-			else
-			{
-				pauseMenu.update(window->currentEvent.mousePosition, states);
-			}
 		}
+		if (pause)
+		{
+			gui.pauseMenu(window, tilemap, states);
+		}
+		
 	}
 
 	void GameState::render()
 	{
-		tilemap->render(window->renderWindow);
-		player->render(window->renderWindow);
-		if (pause)
-		{
-			pauseMenu.render(window->renderWindow);
-		}
-
+		tilemap->render();		
 	}
 
 }

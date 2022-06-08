@@ -24,9 +24,9 @@ namespace Meta {
 
 	void MainMenu::initBackground()
 	{
-		if (!texture.loadFromFile("Images/Background.jpg")) { MT_CORE_ERROR("Images/Background.jpg missing!"); }
-
-		background.setTexture(texture);
+		
+		texture.loadFromFile(window->backgroundFilePaths[0]) == true ?
+			background.setTexture(texture) : MT_CORE_ERROR("MainMenu::initBackground() failed!");
 	}
 
 	void MainMenu::endState()

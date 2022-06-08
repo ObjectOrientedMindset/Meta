@@ -2,7 +2,7 @@
 #include "State.h"
 #include "Meta/GUI/Gui.h"
 #include "Meta/GUI/PauseMenu.h"
-#include "Meta/Tilemap/Tilemap.h"
+#include "Meta/Entities/Tilemap.h"
 
 
 
@@ -30,18 +30,15 @@ namespace Meta {
         float mouseY;
         sf::Cursor cursorArrow;
         sf::Cursor cursorHand;
-        unsigned int timerMax = 100;
+        unsigned int timerMax = 10;
         unsigned int timer = timerMax;
         sf::Vector2f tilePosition = sf::Vector2f(0.f,0.f);
 
         //Functions
         void initEditMap();
-        void addTile(sf::Vector2f tile);
-        void deleteTile(sf::Vector2f tile);
         void tileCollisionCheck();
         bool editMapCollisionCheck();
         void updateMouseCoordinates();
-        void changetileCode();
         void camera();
     public:
         EditorState(std::shared_ptr<Window> window,
@@ -49,9 +46,9 @@ namespace Meta {
         virtual ~EditorState();
 
         //Functions
-        void endState();
-        virtual void update(const float& dt);
-        virtual void render();
+        void endState() override;
+        virtual void update(const float& dt) override;
+        virtual void render() override;
         
     };
 

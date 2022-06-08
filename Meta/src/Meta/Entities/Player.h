@@ -1,14 +1,11 @@
 #pragma once
-#include "Meta/Base/Entities.h"
 #include "Meta/Base/AnimationComponent.h"
-#include "Meta/Base/Core.h"
-
-
+#include "Entity.h"
 
 namespace Meta {
 
 	class META_API Player
-		: public Entities
+		: public Entity
 	{
 	private:
 		//Variables
@@ -20,19 +17,24 @@ namespace Meta {
 		float posX;
 		float posY;
 		AnimationComponent playerAnimations;
-		void initPlayerFromFile();
+		
 
 	public:
-		Player();
+		
+
+		Player(const std::string& id,
+			const sf::Vector2f& position,
+			const int& code, const int& layer,
+			std::shared_ptr<Window> window);
 		virtual ~Player();
 
 		void initTextures();
 		void playerMovement(std::string direction, float dirX, float dirY, const float& dt);
 
-		const sf::Vector2f& getPlayerPosition();
-		void setPlayerPosition(float x, float y);
-		void update();
-		void render(std::shared_ptr<sf::RenderWindow> target);
+		
+		Entity* getInstance() override { return this; }
+		void update(std::string direction, float dirX, float dirY, const float& dt) override;
+		void render() override;
 	};
 
 }

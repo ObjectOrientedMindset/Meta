@@ -17,23 +17,23 @@ namespace Meta {
 	{
 		if (player->data.position.x < posX)
 		{
-			window->moveView(-0.136f, 0.f);
+			window->moveView(-0.07f, 0.f);
 			
 		}
 		else if (player->data.position.x > posX)
 		{
-			window->moveView(0.136f, 0.f);
+			window->moveView(0.07f, 0.f);
 			
 		}
 
 		if (player->data.position.y < posY)
 		{
-			window->moveView(0.f, -0.136f);
+			window->moveView(0.f, -0.07f);
 		
 		}
 		else if (player->data.position.y > posY)
 		{
-			window->moveView(0.f, 0.136f);
+			window->moveView(0.f, 0.07f);
 			
 		}	
 
@@ -83,7 +83,7 @@ namespace Meta {
 
 	void GameState::update(const float& dt)
 	{
-		//unstable objects update(moving)
+		//npc update(moving)
 		if (!pause)
 		{
 			if (updatePlayer(dt)) 
@@ -91,7 +91,7 @@ namespace Meta {
 				camera();
 			}
 		}
-		//stable objects update
+		//objects update
 		if (window->currentEvent.changed)
 		{
 			endState();

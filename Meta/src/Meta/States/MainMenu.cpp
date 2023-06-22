@@ -9,11 +9,11 @@ namespace Meta {
 		:State(window, states)
 	{ //Create button objects
 		initBackground();
-		buttons.push_back(std::make_shared<Button>(125.f, 40.f, (float)(window->renderWindow->getSize().x / 4), (float)(window->renderWindow->getSize().y / 2),
+		buttons.push_back(std::make_shared<Button>(150.f, 50.f, (float)(window->renderWindow->getSize().x / 2), (float)(window->renderWindow->getSize().y / 2),
 			sf::Color(150, 150, 150, 255), sf::Color(70, 70, 70, 200), sf::Color(20, 20, 20, 200), &window->pixelFont, "New Game"));
-		buttons.push_back(std::make_shared<Button>(125.f, 40.f, (float)(window->renderWindow->getSize().x / 4), (float)(window->renderWindow->getSize().y / 2 + 60),
+		buttons.push_back(std::make_shared<Button>(150.f, 50.f, (float)(window->renderWindow->getSize().x / 2), (float)(window->renderWindow->getSize().y / 2 + 60),
 			sf::Color(150, 150, 150, 255), sf::Color(70, 70, 70, 200), sf::Color(20, 20, 20, 200), &window->pixelFont, "Editor"));
-		buttons.push_back(std::make_shared<Button>(125.f, 40.f, (float)(window->renderWindow->getSize().x / 4), (float)(window->renderWindow->getSize().y / 2 + 300),
+		buttons.push_back(std::make_shared<Button>(150.f, 50.f, (float)(window->renderWindow->getSize().x / 2), (float)(window->renderWindow->getSize().y / 2 + 300),
 			sf::Color(150, 150, 150, 255), sf::Color(70, 70, 70, 200), sf::Color(20, 20, 20, 200), &window->pixelFont, "Quit"));
 	}
 

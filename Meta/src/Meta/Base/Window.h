@@ -25,8 +25,8 @@ namespace Meta {
 			unsigned int width, height;
 			bool vsync = false;
 			windowData(const std::string Title = "Meta Engine",
-				unsigned int Width = 1024,
-				unsigned int Heigth = 960)
+				unsigned int Width = 1920,
+				unsigned int Heigth = 1080)
 				: title(Title), width(Width), height(Heigth)
 			{
 			}
@@ -34,6 +34,7 @@ namespace Meta {
 	private:
 		windowData w_Data;
 		sf::Vector2f mousePositionOffset;
+		
 	public:
 		Event currentEvent;
 		sf::Font pixelFont;

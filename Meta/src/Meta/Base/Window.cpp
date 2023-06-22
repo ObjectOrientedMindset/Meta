@@ -165,9 +165,16 @@ namespace Meta {
 		renderWindow = std::make_shared<sf::RenderWindow>(
 			sf::VideoMode(w_Data.width, w_Data.height)
 			, w_Data.title, sf::Style::Close | sf::Style::Titlebar
-			| sf::Style::Resize);
+			);
 
-		if (renderWindow->isOpen()) MT_CORE_INFO("Window initialized!");
+		if (renderWindow->isOpen()) MT_CORE_INFO("Window Initialized!");
+		else MT_CORE_FATAL("Window Initialization Failed!");
+
+		sf::Image logo = sf::Image();
+
+		if (!logo.loadFromFile("Assets/Logo/M.png")) MT_CORE_ERROR("Logo M.png Loading Failed!");
+
+		renderWindow->setIcon(logo.getSize().x, logo.getSize().y, logo.getPixelsPtr());
 
 		if (!pixelFont.loadFromFile("Fonts/PixellettersFull.ttf")) MT_CORE_ERROR("Fonts/PixellettersFull.ttf Loading Failed!");
 		//ImGui Init

@@ -15,7 +15,7 @@ namespace Meta {
 		data.code = code;
 		data.layer = layer;
 		initTextures();
-		timerMax = 500.f;
+		timerMax = 250.f;
 		timer = timerMax;
 		playerSprite.setPosition(position.x, position.y);
 		movementSpeed = 200.f;
